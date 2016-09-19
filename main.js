@@ -7,11 +7,10 @@ let App = React.createClass({
 
   componentDidMount() {
     let movieStore = this.movieStorage();
-    this.setState({ movies: movieStore });
-  },
-
-  sortByScore(){
-    
+    let newMovieList = movieStore.sort((cur, next) => {
+      return (next.score - cur.score);
+    });
+    this.setState({ movies: newMovieList });
   },
 
   addMovie(newMovie) {
@@ -55,6 +54,19 @@ let App = React.createClass({
     })
   },
 
+  sortByScore(){
+    let json = localStorage.movieStore;
+    let movieStore = JSON.parse(json);
+    let newMovieList = movieStore.sort((cur, next) => {
+      return (next.score - cur.score);
+    });
+    this.writeToStorage(newMovieList);
+    this.setState({
+      movies: newMovieList
+    })
+    return newMovieList;
+  },
+
   render() {
     return (
       <div className="container">
@@ -63,7 +75,7 @@ let App = React.createClass({
         </div>
         <br/>
         <div className="row">
-          <MovieList movies={this.state.movies} getScore={this.getScore}/>
+          <MovieList movies={this.state.movies} getScore={this.getScore} sortByScore={this.sortByScore}/>
         </div>
       </div>
     )
@@ -79,6 +91,7 @@ const MovieList = React.createClass({
       score: newNumber
     }
     this.props.getScore(newScore);
+    this.props.sortByScore();
   },
 
   downVote(id, number) {
@@ -88,6 +101,7 @@ const MovieList = React.createClass({
       score: newNumber
     }
     this.props.getScore(newScore);
+    this.props.sortByScore();
   },
 
   render() {
